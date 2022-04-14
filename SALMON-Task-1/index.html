@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+        }
+        input{
+            
+            height:100%
+        }
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        #save_button{
+            margin-top:6px;
+            margin-bottom: 12px;
+            margin-left:1px;
+        }
+        h{
+            font-family: arial, sans-serif;
+            text-decoration: underline;
+        }
+        #fetch_section{
+            margin-bottom: 12px;
+            margin-left:1px;
+            
+        }
+        #btn{
+            margin-left:8px;
+        }
+        
+        </style>
+</head>
+<body>
+    <section> 
+        <form action="https://sheetdb.io/api/v1/oorq1mdyg9t0c" method="post" id="sheetdb-form">
+            <table>
+                <tr>
+                  <th>FirstName</th>
+                  <th>LastName</th>
+                </tr>
+                <tr>
+                  <td><input type="text" id="FirstName" placeholder="" name="data[FirstName]"></td>
+                  <td><input type="text" id="Name" placeholder="" name="data[LastName]"></td>
+                </tr>
+              </table> 
+              <button id="save_button">Save</button>
+        </form>
+    
+    </section>    
+    <section id="fetch_section">
+        <input type="text">
+        <button id="bttn" onclick="queryByName()">Fetch</button>
+    </section>
+    <section id="show_data">
+        <section id="show_table">
+        </section>
+
+    </section>
+    <script>
+        var form = document.getElementById('sheetdb-form');
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+            e.innerText="Saving...";
+            fetch(form.action, {
+            method : "POST",
+            body: new FormData(document.getElementById("sheetdb-form")),
+            }).then(
+            response => response.json()
+            ).then((html) => {
+            // you can put any JS code here
+            e.innerText="Saving..."
+            form.reset();
+
+            });
+        });
+
+        function queryByName(){
+            console.log("queryByName");
+            var name = document.getElementById('fetch_section').querySelector('input').value;
+            fetch(`https://sheetdb.io/api/v1/oorq1mdyg9t0c/search?FirstName=${name}&casesensitive=false`)
+            .then(response => {
+                if(response.ok)
+                    { return response.json();
+                } 
+                else
+                {console.log("here");
+                var html = document.getElementById('show_data');
+                var h=document.createElement('h');
+                h.innerHTML='Name does not exist in data storage';
+                html.appendChild(h);
+                throw new Error('Something went wrong');}
+            })
+            .then(data => {
+                console.log(data);
+                // document.getElementById('show_table').remove();
+                if(data.length>0)
+                {
+                document.getElementById('show_table').remove();
+                var table = document.createElement('table');
+                var tr = document.createElement('tr');
+                var th1 = document.createElement('th');
+                var th2 = document.createElement('th');
+                th1.innerHTML = 'FirstName';
+                th2.innerHTML = 'LastName';
+                tr.appendChild(th1);
+                tr.appendChild(th2);
+                table.appendChild(tr);
+                data.forEach(element => {
+                    var tr = document.createElement('tr');
+                    var td1 = document.createElement('td');
+                    var td2 = document.createElement('td');
+                    td1.innerHTML = element.FirstName;
+                    td2.innerHTML = element.LastName;
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    table.appendChild(tr);
+                });
+                var html = document.getElementById('show_data');
+                var show_table = document.createElement('section');
+                show_table.setAttribute('id', 'show_table');
+                html.appendChild(show_table);
+                // document.getElementById('show_data').appendChild(table);
+                document.getElementById('show_table').appendChild(table);
+            }
+                else
+                {
+                    document.getElementById('show_table').remove();
+                    var h = document.createElement('h');
+                    h.innerHTML='Name does not exist in the data storage.';
+                    var html = document.getElementById('show_data');
+                    var show_table = document.createElement('section');
+                    show_table.setAttribute('id', 'show_table');
+                    html.appendChild(show_table);
+                    document.getElementById('show_table').appendChild(h);
+                }
+            })
+            .catch( (error) => {console.log(error)});
+            
+        }
+    </script>
+    <!-- <script src="fetch.js"></script> -->
+</body>
+</html>
